@@ -19,7 +19,7 @@ pub struct Memory {
     filename: String,
     mem: Vec<u8>, /* byte vector */
     size: u64,    /* size of memory, grabbed from vector */
-    pub is_little_endian: bool, /* default = true */
+    is_little_endian: bool, /* default = true */
 }
 
 impl Memory {
@@ -31,6 +31,18 @@ impl Memory {
             size: 0,
             is_little_endian: true,
         };
+    }
+
+    pub fn get_size(&mut self) -> u64 {
+        return self.size;
+    }
+
+    pub fn make_little_endian(&mut self) {
+        self.is_little_endian = true;
+    }
+
+    pub fn make_big_endian(&mut self){
+        self.is_little_endian = false;
     }
     
     /*
@@ -113,10 +125,15 @@ impl Memory {
         println!("successfully loaded {}",self.filename);
         return Ok(());
     }
-
-
-    /* parse from an actual binary file */
-    /* populates our u8 vec */
+    /*
+     * name: load_from_text
+     * params:
+     *  self -> instance of struct
+     *  file -> reference to input file 
+     * 
+     * NOTE: the application expects this to be a compiled riscV binary
+     * 
+     */
     pub fn load_from_bin(&mut self,infile: &str) -> Result<(),()>{
         self.filename = infile.to_string();
         let file = File::open(infile);
@@ -128,7 +145,10 @@ impl Memory {
         let metadata = fs::metadata(&infile).expect("Unable to read metadata");
         self.mem = vec![0;metadata.len() as usize];
         match file.read_exact(&mut self.mem){
-            Ok(_) => return Ok(()),
+            Ok(_) => {
+                self.size = self.mem.len().try_into().unwrap();
+                return Ok(());
+            }
             Err(_) => {
                 println!("Error Reading Binary File");
                 return Err(());
@@ -146,7 +166,7 @@ impl Memory {
     pub fn read_32bit(&mut self, addr: u64) -> u32 {
         // also convert to 8 bit address
         let addr: usize = (addr*4).try_into().unwrap();
-        let slice: Vec<u8> = self.mem[addr..(addr+3)].to_vec(); 
+        let slice: Vec<u8> = self.mem[addr..(addr+4)].to_vec(); 
         let res: u32 = self.conv8to32(slice);
         return res; 
     }
@@ -168,11 +188,19 @@ impl Memory {
         }
     }
 
+    // /* dump memory contents to file */
+    // pub fn debug_mem_dump(&mut self, outfile: &String) {
+    //     println!("Dumping to {}",outfile);
+    //     for addr in &self.mem {
+    //         println!("{:02x}",addr);
+    //     }
+    // }
+
     /* print current memory to outfile for debug purpose */
-    pub fn debug_mem_dump(&mut self, outfile: &String) {
-        println!("Dumping to {}",outfile);
-        for addr in &self.mem {
-            println!("{:02x}",addr);
+    pub fn debug_print_mem_dump(&mut self) {
+        let num_words: u64 = self.get_size()/4;
+        for i in 0..num_words{
+            println!("{:08x}",self.read_32bit(i));
         }
     }
 }
