@@ -1,0 +1,1 @@
+/home/marquezjones/Dropbox/00_FALL2022/RISCV/app/riscv_vm_prj/target/debug/riscv_vm: /home/marquezjones/Dropbox/00_FALL2022/RISCV/app/riscv_vm_prj/src/main.rs /home/marquezjones/Dropbox/00_FALL2022/RISCV/app/riscv_vm_prj/src/memory.rs
