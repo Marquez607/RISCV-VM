@@ -4,6 +4,7 @@ ARCH64 = riscv64-unknown-elf
 ARCH = $(ARCH32)
 CC32 = -march=rv32ima -mabi=ilp32
 CC = $(CC32)
+OUTFOLDER = ./outfolder
 
 #all:
 #	riscv32-unknown-elf-gcc $(SRC) -o $(SRC).elf -static
@@ -19,7 +20,8 @@ customlink:
 	$(ARCH)-ld -T linker.ld $(SRC).o entry.o -o $(SRC).elf 
 	$(ARCH)-objdump -D $(SRC).elf > $(SRC).elf.obj
 	xxd $(SRC).elf > $(SRC).xxd
-	~/Tools/elf2hex/elf2hex --input $(SRC).elf --output $(SRC).hex --bit-width 32
+	elf2hex --input $(SRC).elf --output $(SRC).hex --bit-width 32
+	elf2bin --input $(SRC).elf --output $(SRC).bin 
 
 clean:
 	rm -f *.elf

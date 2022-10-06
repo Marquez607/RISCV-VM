@@ -25,6 +25,17 @@ Temporarily adding the compiler to your shell environment \
 export PATH=$PATH:/where/you/want/it
 ```
 
+### SiFive elf2hex
+You'll also need this downloaded and compiled on your system somewhere, it's used for generating the binary or hex text files used in the tool.
+
+Link: https://github.com/sifive/elf2hex
+
+
+This should also be added to your $PATH variable after downloading 
+```
+export PATH=$PATH:/where/you/put/elf2hex/
+```
+
 ## Folder/Files
 
 ### riscv_code 
