@@ -19,8 +19,17 @@ pub struct Memory {
     filename: String,
     mem: Vec<u8>, /* byte vector */
     size: u64,    /* size of memory, grabbed from vector */
-    is_little_endian: bool, /* default = true */
+    is_little_end
+    ian: bool, /* default = true */
 }
+
+/* set to some giant address */
+#[derive(Debug)]
+enum PeripheralMap {
+    PORTA = 0x7000000,
+    PORTB,
+}
+
 
 impl Memory {
     /* constructor: return blank string and blank vector*/

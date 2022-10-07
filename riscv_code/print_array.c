@@ -3,11 +3,10 @@
 char dummy[] = "dummy";
 char marquez_arr[] = "Marquez";
 
-#define PORTA_IN 0x70000000
-#define PORTB_OUT 0x70000002
+#define PORTA = 0x7000000 //some huge address
 
 void putchar(char c){
-    uint8_t *out = (uint8_t*)PORTB_OUT;
+    uint8_t *out = (uint8_t*)PORTA;
     *out = c;
 }
 

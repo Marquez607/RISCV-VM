@@ -17,6 +17,12 @@ SECTIONS {
 		PROVIDE(global_pointer = .);
 		PROVIDE(bss_end = .);
 	}
+	.periph : ALIGN(4K) {
+		PROVIDE(periph_start = .);
+		*(.periph);
+		. += 4096;
+		PROVIDE(periph_end = .);
+	}
 	.rodata : ALIGN(4K) {
 		*(.rodata);
 	}

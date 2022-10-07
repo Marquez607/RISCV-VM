@@ -30,8 +30,8 @@ Disassembly of section .text:
   48:	03010413          	addi	s0,sp,48
   4c:	00050793          	mv	a5,a0
   50:	fcf40fa3          	sb	a5,-33(s0)
-  54:	700007b7          	lui	a5,0x70000
-  58:	00278793          	addi	a5,a5,2 # 70000002 <marquez_arr+0x6fffcfd2>
+  54:	00003797          	auipc	a5,0x3
+  58:	fac78793          	addi	a5,a5,-84 # 3000 <bss_end>
   5c:	fef42623          	sw	a5,-20(s0)
   60:	fec42783          	lw	a5,-20(s0)
   64:	fdf44703          	lbu	a4,-33(s0)
@@ -46,8 +46,8 @@ Disassembly of section .text:
   80:	00112e23          	sw	ra,28(sp)
   84:	00812c23          	sw	s0,24(sp)
   88:	02010413          	addi	s0,sp,32
-  8c:	00003797          	auipc	a5,0x3
-  90:	fa478793          	addi	a5,a5,-92 # 3030 <marquez_arr>
+  8c:	00004797          	auipc	a5,0x4
+  90:	fa478793          	addi	a5,a5,-92 # 4030 <marquez_arr>
   94:	fef42623          	sw	a5,-20(s0)
   98:	0200006f          	j	b8 <main+0x3c>
   9c:	fec42783          	lw	a5,-20(s0)
@@ -62,8 +62,8 @@ Disassembly of section .text:
   c0:	fc079ee3          	bnez	a5,9c <main+0x20>
   c4:	00a00513          	li	a0,10
   c8:	f79ff0ef          	jal	ra,40 <putchar>
-  cc:	00003797          	auipc	a5,0x3
-  d0:	f5c78793          	addi	a5,a5,-164 # 3028 <dummy>
+  cc:	00004797          	auipc	a5,0x4
+  d0:	f5c78793          	addi	a5,a5,-164 # 4028 <dummy>
   d4:	fef42623          	sw	a5,-20(s0)
   d8:	0200006f          	j	f8 <main+0x7c>
   dc:	fec42783          	lw	a5,-20(s0)
@@ -88,41 +88,46 @@ Disassembly of section .bss:
 00002000 <stack_top>:
 	...
 
+Disassembly of section .periph:
+
+00003000 <periph_start>:
+	...
+
 Disassembly of section .eh_frame:
 
-00003000 <.eh_frame>:
-    3000:	0010                	0x10
-    3002:	0000                	unimp
-    3004:	0000                	unimp
-    3006:	0000                	unimp
-    3008:	00527a03          	0x527a03
-    300c:	7c01                	lui	s8,0xfffe0
-    300e:	0101                	addi	sp,sp,0
-    3010:	00020d1b          	0x20d1b
-    3014:	0010                	0x10
-    3016:	0000                	unimp
-    3018:	0018                	0x18
-    301a:	0000                	unimp
-    301c:	cfe4                	sw	s1,92(a5)
-    301e:	ffff                	0xffff
-    3020:	0040                	addi	s0,sp,4
-    3022:	0000                	unimp
-    3024:	0000                	unimp
+00004000 <.eh_frame>:
+    4000:	0010                	0x10
+    4002:	0000                	unimp
+    4004:	0000                	unimp
+    4006:	0000                	unimp
+    4008:	00527a03          	0x527a03
+    400c:	7c01                	lui	s8,0xfffe0
+    400e:	0101                	addi	sp,sp,0
+    4010:	00020d1b          	0x20d1b
+    4014:	0010                	0x10
+    4016:	0000                	unimp
+    4018:	0018                	0x18
+    401a:	0000                	unimp
+    401c:	bfe4                	fsd	fs1,248(a5)
+    401e:	ffff                	0xffff
+    4020:	0040                	addi	s0,sp,4
+    4022:	0000                	unimp
+    4024:	0000                	unimp
 	...
 
 Disassembly of section .sdata:
 
-00003028 <dummy>:
-    3028:	7564                	flw	fs1,108(a0)
-    302a:	6d6d                	lui	s10,0x1b
-    302c:	0079                	c.nop	30
+00004028 <dummy>:
+    4028:	7564                	flw	fs1,108(a0)
+    402a:	6d6d                	lui	s10,0x1b
+    402c:	0079                	c.nop	30
 	...
 
-00003030 <marquez_arr>:
-    3030:	614d                	addi	sp,sp,176
-    3032:	7172                	flw	ft2,60(sp)
-    3034:	6575                	lui	a0,0x1d
-    3036:	007a                	c.slli	zero,0x1e
+00004030 <marquez_arr>:
+    4030:	614d                	addi	sp,sp,176
+    4032:	7172                	flw	ft2,60(sp)
+    4034:	6575                	lui	a0,0x1d
+    4036:	007a                	c.slli	zero,0x1e
 
 Disassembly of section .comment:
 
