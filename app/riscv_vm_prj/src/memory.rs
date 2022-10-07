@@ -19,17 +19,17 @@ pub struct Memory {
     filename: String,
     mem: Vec<u8>, /* byte vector */
     size: u64,    /* size of memory, grabbed from vector */
-    is_little_end
-    ian: bool, /* default = true */
+    is_little_endian: bool, /* default = true */
 }
 
 /* set to some giant address */
 #[derive(Debug)]
 enum PeripheralMap {
-    PORTA = 0x7000000,
-    PORTB,
+    TEST_REG = 0x7000000,
+    PORTA,
+    PORTB ,
+    INVALID,
 }
-
 
 impl Memory {
     /* constructor: return blank string and blank vector*/
@@ -54,6 +54,18 @@ impl Memory {
         self.is_little_endian = false;
     }
     
+    /* check if provided addr is a peripheral mapping */
+    pub fn check_peripheral(&mut self, addr: u64 ) -> bool {
+        if addr > PeripheralMap::INVALID as u64{
+            return false;
+        }
+
+        if addr < PeripheralMap::TEST_REG as u64{
+            return false;
+        }
+        return true;
+    }
+
     /*
      * name: conv32to8 
      * desc: converts a 32 bit number to a vector of 8 bits
