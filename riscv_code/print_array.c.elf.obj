@@ -30,8 +30,8 @@ Disassembly of section .text:
   48:	03010413          	addi	s0,sp,48
   4c:	00050793          	mv	a5,a0
   50:	fcf40fa3          	sb	a5,-33(s0)
-  54:	00003797          	auipc	a5,0x3
-  58:	fac78793          	addi	a5,a5,-84 # 3000 <bss_end>
+  54:	070007b7          	lui	a5,0x7000
+  58:	00178793          	addi	a5,a5,1 # 7000001 <marquez_arr+0x6ffbfd1>
   5c:	fef42623          	sw	a5,-20(s0)
   60:	fec42783          	lw	a5,-20(s0)
   64:	fdf44703          	lbu	a4,-33(s0)
@@ -90,7 +90,7 @@ Disassembly of section .bss:
 
 Disassembly of section .periph:
 
-00003000 <periph_start>:
+00003000 <.periph>:
 	...
 
 Disassembly of section .eh_frame:

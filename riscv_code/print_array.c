@@ -1,9 +1,8 @@
 #include <stdint.h>
+#include "peripheral.h"
 
 char dummy[] = "dummy";
 char marquez_arr[] = "Marquez";
-
-#define PORTA = 0x7000000 //some huge address
 
 void putchar(char c){
     uint8_t *out = (uint8_t*)PORTA;
