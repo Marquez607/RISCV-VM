@@ -2,6 +2,9 @@
 #ifndef _PERIPHERAL_H_
 #define _PERIPHERAL_H_
 
-#define PORTA 0x7000001 //some huge address
+#define TEST            0x7000000
+#define CONSOLE_FIFO_RX 0x7000001
+#define CONSOLE_FIFO_RX 0x7000002
+#define CONSOLE_FLAGS   0x7000003
 
-#endif 
+#endif

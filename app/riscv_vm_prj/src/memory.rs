@@ -1,5 +1,5 @@
 /*
- * name: hexload.rs
+ * name: memory.rs
  * desc: sytem for loading .hex containing riscv program and other memory this will dump
  *       the file to an internal datastructure that'll simulate the CPU memory
  * 
@@ -13,6 +13,8 @@ use std::{
     io::{Read, BufRead, BufReader},
 };
 use std::fs;
+pub mod vuart;
+use vuart::*;
 
 #[derive(Debug)]
 pub struct Memory {
@@ -25,10 +27,11 @@ pub struct Memory {
 /* set to some giant address */
 #[derive(Debug)]
 enum PeripheralMap {
-    TEST_REG = 0x7000000,
-    PORTA,
-    PORTB ,
-    INVALID,
+    BASE = 0x7000000,            /* base address, same as first peripheral */
+    UART_FIFO_RX = 0x7000000,    /* read only  */
+    UART_FIFO_TX,                /* write only */
+    UART_FLAGS,                  /* read only  */
+    INVALID,                     /* failure    */
 }
 
 impl Memory {
@@ -56,14 +59,23 @@ impl Memory {
     
     /* check if provided addr is a peripheral mapping */
     pub fn check_peripheral(&mut self, addr: u64 ) -> bool {
-        if addr > PeripheralMap::INVALID as u64{
+        if addr >= PeripheralMap::INVALID as u64{
             return false;
         }
 
-        if addr < PeripheralMap::TEST_REG as u64{
+        if addr < PeripheralMap::BASE as u64{
             return false;
         }
         return true;
+    }
+
+    /* peripheral handler */
+    pub fn peripheral_read(&mut self, addr: u64) -> u8 {
+        return 0;
+    }
+
+    pub fn peripheral_write(&mut self, addr: u64, data: u8) {
+
     }
 
     /*
@@ -142,6 +154,8 @@ impl Memory {
                 self.mem.push(x);
             }
         }
+
+        //if this panics, I'll cry
         self.size = self.mem.len().try_into().unwrap();
         println!("successfully loaded {}",self.filename);
         return Ok(());
