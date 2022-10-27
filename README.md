@@ -1,4 +1,12 @@
 # RISCV_VM
+## Reference Material 
+### Making a baremetal RISC-V executable 
+https://wiki.osdev.org/RISC-V_Bare_Bones
+
+### RISCV ISA 
+ISA: https://msyksphinz-self.github.io/riscv-isadoc/html/rvi.html \
+Other Specs/Docs: https://riscv.org/technical/specifications/
+
 ## Development Environment
 ### Rust 
 The system we write will be in rust 
