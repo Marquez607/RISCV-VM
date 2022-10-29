@@ -5,14 +5,19 @@
 
 use std::sync::{Arc, Mutex};
 use std::thread;
+use std::collections::VecDeque;
 
 #[derive(Debug)]
 enum UartRegs {
-    BASE = 0x7000000,
     UART_FIFO_RX = 0x7000000,      /* read only  */
     UART_FIFO_TX,                  /* write only */
     UART_FLAGS,                    /* read only  */
     INVALID,                          /* failure    */
+}
+
+impl UartRegs {
+
+    pub const BASE: UartRegs = UartRegs::UART_FIFO_RX;
 }
 
 /* peripheral flags bit masks */
@@ -25,8 +30,8 @@ pub enum UartFlagsBm {
 /* will be wrapping this in a mutex for read/write threads */
 #[derive(Debug)]
 struct UartComp{
-    rx_fifo: Vec<u8>,
-    tx_fifo: Vec<u8>,
+    rx_fifo: VecDeque<u8>,
+    tx_fifo: VecDeque<u8>,
     flags: u8,
 }
 
@@ -34,27 +39,38 @@ impl UartComp {
     /* constructor: empty vectors */
     pub fn new() -> UartComp {
         return UartComp {
-            rx_fifo: Vec::new(),
-            tx_fifo: Vec::new(),
+            rx_fifo: VecDeque::new(),
+            tx_fifo: VecDeque::new(),
             flags: 0, 
         };
     }
 }
 
 /* mutex protected */
-#[derive(Debug)]
+#[derive(Clone,Debug)]
 pub struct Uart{
     uart_arc: Arc<Mutex<UartComp>>, /* above uart component */
 }
 
 /* data coming from the cpu */
-fn console_tx_thread( uart_arc:  Arc<Mutex<UartComp>> ) {
+fn console_tx_thread( mut uart: Uart ) {
     println!("Tx Thread Spawned");
+    loop {
+        let len: usize = uart.ext_check_tx_fifo_len();
+        if( len > 0){
+            for i in 0..len{
+                print!("{}",uart.ext_read_tx_fifo());
+            }
+        }
+    }
 }
 
 /* data going to the cpu */
-fn console_rx_thread( uart_arc:  Arc<Mutex<UartComp>> ) {
+fn console_rx_thread( mut uart: Uart  ) {
     println!("Rx Thread Spawned");
+    loop {
+
+    }
 }
 
 /* providing "bare bones" implemenation, ideally, the CPU will probe the UART flag register 
@@ -67,45 +83,76 @@ impl Uart {
 
         let this_uart_arc_orig = Arc::new(Mutex::new(UartComp::new()));
 
+        let uart: Uart = Uart {
+            uart_arc: Arc::clone( &this_uart_arc_orig ),
+        };
+
         /* fork back ground threads */
-        let this_uart_arc = Arc::clone(&this_uart_arc_orig);
+        let thread_uart : Uart = uart.clone();
         thread::spawn(move || {
-            console_read_thread(this_uart_arc);
+            console_rx_thread( thread_uart );
         });
 
         /* write thread */
-        let this_uart_arc = Arc::clone(&this_uart_arc_orig);
+        let thread_uart : Uart = uart.clone();
         thread::spawn(move || {
-            console_write_thread(this_uart_arc);
+            console_tx_thread( thread_uart );
         });
 
-        return Uart {
-            uart_arc: Arc::clone(&this_uart_arc_orig),
-        };
+        return uart;
     }
 
-    pub fn get_flags(&mut self) -> u8 {
-
+    pub fn cpu_get_flags(&mut self) -> u8 {
         let mut uart = self.uart_arc.lock().unwrap();
         return (*uart).flags;
+    }
+
+    /* should not be used by the memory module/cpu */
+    pub fn ext_check_tx_fifo_len(&mut self) -> usize {
+        let mut uart = self.uart_arc.lock().unwrap();
+        return (*uart).tx_fifo.len();
+    }
+
+    /* should not be used by the memory module/cpu */
+    pub fn ext_read_tx_fifo(&mut self) -> u8 {
+        let mut uart = self.uart_arc.lock().unwrap();
+        if (*uart).tx_fifo.is_empty(){
+            println!("ERROR: tx_fifo empty");
+            return 0; 
+        }
+        return (*uart).tx_fifo.pop_front().unwrap();
+    }
+
+    /* should not be used by the memory module */
+    pub fn ext_write_rx_fifo(&mut self, data: u8){
+        let mut uart = self.uart_arc.lock().unwrap();
+        if (*uart).rx_fifo.is_empty(){
+            /* set this flag for the CPU to read */
+            (*uart).flags |= (UartFlagsBm::RX_DATA_AVAIL_bm as u8);
+        }
+        (*uart).rx_fifo.push_back(data);
+    }
+
+    pub fn cpu_write_tx_fifo(&mut self, data: u8){
+        let mut uart = self.uart_arc.lock().unwrap();
+        (*uart).tx_fifo.push_back(data);
+    }
+
+    pub fn cpu_read_rx_fifo(&mut self) -> u8 {
+        let mut uart = self.uart_arc.lock().unwrap();
+        if (*uart).rx_fifo.is_empty(){
+            println!("ERROR: rx_fifo empty");
+            return 0; 
+        }
+        let ret: u8 = (*uart).rx_fifo.pop_front().unwrap();
         
-    }
+        /* if that was the last available data in the fifo, clear flag for cpu */
+        if (*uart).rx_fifo.is_empty(){
+            /* clear the data flag */
+            (*uart).flags &= !(UartFlagsBm::RX_DATA_AVAIL_bm as u8);
+        }
 
-    pub fn write_tx_fifo(&mut self, data: u8){
-
-    }
-
-    /* should not be used by the memory module */
-    pub fn read_tx_fifo(&mut self) -> u8 {
-
-    }
-
-    /* should not be used by the memory module */
-    pub fn write_rx_fifo(&mut self, data: u8){
-
-    }
-
-    pub fn read_rx_fifo(&mut self) -> u8 {
+        return ret;
 
     }
 }

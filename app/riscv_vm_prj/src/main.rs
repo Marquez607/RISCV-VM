@@ -1,5 +1,6 @@
 pub mod memory;
 use memory::*;
+use vuart:: *;
 
 fn dump_test() {
     let mut memory: Memory = Memory::new();
@@ -59,9 +60,19 @@ fn read_write_test() {
     println!("read_32bit : val={:08x}",tval32); 
 }
 
+fn uart_test() {
+
+}
+    // dump_test();
+    // read_write_test();
 fn main() {
-    dump_test();
-    read_write_test();
 
+    let mut uart: Uart = Uart::new();
+    let mut count: u8 = 0;
 
+    loop {
+        uart.cpu_write_tx_fifo(count);
+        count += 1;
+        count %= 8;
+    }
 }

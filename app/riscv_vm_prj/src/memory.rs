@@ -27,12 +27,16 @@ pub struct Memory {
 /* set to some giant address */
 #[derive(Debug)]
 enum PeripheralMap {
-    BASE = 0x7000000,            /* base address, same as first peripheral */
     UART_FIFO_RX = 0x7000000,    /* read only  */
     UART_FIFO_TX,                /* write only */
     UART_FLAGS,                  /* read only  */
     INVALID,                     /* failure    */
 }
+
+impl PeripheralMap {
+    pub const BASE: PeripheralMap  = PeripheralMap::UART_FIFO_RX; /* base address, same as first peripheral */
+}
+
 
 impl Memory {
     /* constructor: return blank string and blank vector*/
