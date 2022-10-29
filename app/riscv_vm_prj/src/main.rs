@@ -68,11 +68,10 @@ fn uart_test() {
 fn main() {
 
     let mut uart: Uart = Uart::new();
-    let mut count: u8 = 0;
 
     loop {
-        uart.cpu_write_tx_fifo(count);
-        count += 1;
-        count %= 8;
+        while( (uart.cpu_get_flags() ) == 0 ){}
+        let data: u8 = uart.cpu_read_rx_fifo();
+        uart.cpu_write_tx_fifo(data);
     }
 }

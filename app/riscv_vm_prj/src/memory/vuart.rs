@@ -6,6 +6,7 @@
 use std::sync::{Arc, Mutex};
 use std::thread;
 use std::collections::VecDeque;
+use std::io;
 
 #[derive(Debug)]
 enum UartRegs {
@@ -56,10 +57,11 @@ pub struct Uart{
 fn console_tx_thread( mut uart: Uart ) {
     println!("Tx Thread Spawned");
     loop {
+        /* just wait for cpu to transmit data */
         let len: usize = uart.ext_check_tx_fifo_len();
         if( len > 0){
             for i in 0..len{
-                print!("{}",uart.ext_read_tx_fifo());
+                print!("{}",uart.ext_read_tx_fifo() as char);
             }
         }
     }
@@ -69,7 +71,14 @@ fn console_tx_thread( mut uart: Uart ) {
 fn console_rx_thread( mut uart: Uart  ) {
     println!("Rx Thread Spawned");
     loop {
-
+        let mut user_input = String::new();
+        let stdin = io::stdin();
+        stdin.read_line(&mut user_input);
+        //println!("{}",user_input);
+        let char_vec: Vec<char> = user_input.chars().collect();
+        for c in char_vec {
+            uart.ext_write_rx_fifo(c as u8);
+        }      
     }
 }
 
