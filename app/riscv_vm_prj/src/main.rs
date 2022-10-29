@@ -73,5 +73,6 @@ fn main() {
         while( (uart.cpu_get_flags() ) == 0 ){}
         let data: u8 = uart.cpu_read_rx_fifo();
         uart.cpu_write_tx_fifo(data);
+        uart.cpu_write_tx_fifo('\n' as u8);
     }
 }
