@@ -2,6 +2,10 @@ pub mod memory;
 use memory::*;
 use vuart:: *;
 
+const RX_ADDR: u64   = 0x7000000;
+const TX_ADDR: u64   = 0x7000001;
+const FLAG_ADDR: u64 = 0x7000002;
+
 fn dump_test() {
     let mut memory: Memory = Memory::new();
     match memory.load_from_text("print_array.c.hex"){
@@ -62,17 +66,28 @@ fn read_write_test() {
 
 fn uart_test() {
 
+    let mut memory: Memory = Memory::new();
+    match memory.load_from_text("print_array.c.hex"){
+        Ok(_) => println!("Mission Accomplished"),
+        Err(_) => {
+            println!("Done goofed"); 
+            return;
+        }
+    }
+    println!("Memory Size = {}",memory.get_size());
+
+
+    loop {
+        while( (memory.read_8bit(FLAG_ADDR) ) == 0 ){}
+        let data: u8 = memory.read_8bit(RX_ADDR);
+        memory.write_8bit(TX_ADDR,data);
+        memory.write_8bit(TX_ADDR,'\n' as u8);
+    }  
+
 }
     // dump_test();
     // read_write_test();
 fn main() {
 
-    let mut uart: Uart = Uart::new();
-
-    loop {
-        while( (uart.cpu_get_flags() ) == 0 ){}
-        let data: u8 = uart.cpu_read_rx_fifo();
-        uart.cpu_write_tx_fifo(data);
-        uart.cpu_write_tx_fifo('\n' as u8);
-    }
+    uart_test();
 }

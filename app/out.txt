@@ -1,0 +1,5 @@
+Tx Thread Spawned
+Rx Thread Spawned
+successfully loaded print_array.c.hex
+Mission Accomplished
+Memory Size = 16440

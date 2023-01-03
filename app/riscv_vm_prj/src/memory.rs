@@ -77,24 +77,20 @@ impl Memory {
 
     /* peripheral handler */
     pub fn peripheral_read(&mut self, addr: u64) -> u8 {
-        let rx: u64 = PeripheralMap::UART_FIFO_RX as u64;
-        let tx: u64 = PeripheralMap::UART_FIFO_TX as u64;
-        let flags: u64 = PeripheralMap::UART_FLAGS as u64;
         match addr{
-            rx => self.uart.cpu_read_rx_fifo(),
-            tx => 0,
-            flags => self.uart.cpu_get_flags(),
+            addr if addr == PeripheralMap::UART_FIFO_RX as u64 => self.uart.cpu_read_rx_fifo(),
+            addr if addr == PeripheralMap::UART_FIFO_TX as u64 => 0,
+            addr if addr == PeripheralMap::UART_FLAGS as u64 => self.uart.cpu_get_flags(),
+            _ => return 0,
         }
     }
 
     pub fn peripheral_write(&mut self, addr: u64, data: u8) {
-        let rx: u64 = PeripheralMap::UART_FIFO_RX as u64;
-        let tx: u64 = PeripheralMap::UART_FIFO_TX as u64;
-        let flags: u64 = PeripheralMap::UART_FLAGS as u64;
         match addr{
-            rx  => return,
-            tx => self.uart.cpu_write_tx_fifo(data), 
-            flags => return,
+            addr if addr == PeripheralMap::UART_FIFO_RX as u64 => return,
+            addr if addr == PeripheralMap::UART_FIFO_TX as u64 => self.uart.cpu_write_tx_fifo(data), 
+            addr if addr == PeripheralMap::UART_FLAGS as u64 => return,
+            _ => return,
         }
     }
 
