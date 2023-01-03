@@ -22,6 +22,7 @@ pub struct Memory {
     mem: Vec<u8>, /* byte vector */
     size: u64,    /* size of memory, grabbed from vector */
     is_little_endian: bool, /* default = true */
+    uart: Uart,
 }
 
 /* set to some giant address */
@@ -46,6 +47,7 @@ impl Memory {
             mem: Vec::new(),
             size: 0,
             is_little_endian: true,
+            uart: Uart::new(),
         };
     }
 
@@ -75,11 +77,25 @@ impl Memory {
 
     /* peripheral handler */
     pub fn peripheral_read(&mut self, addr: u64) -> u8 {
-        return 0;
+        let rx: u64 = PeripheralMap::UART_FIFO_RX as u64;
+        let tx: u64 = PeripheralMap::UART_FIFO_TX as u64;
+        let flags: u64 = PeripheralMap::UART_FLAGS as u64;
+        match addr{
+            rx => self.uart.cpu_read_rx_fifo(),
+            tx => 0,
+            flags => self.uart.cpu_get_flags(),
+        }
     }
 
     pub fn peripheral_write(&mut self, addr: u64, data: u8) {
-
+        let rx: u64 = PeripheralMap::UART_FIFO_RX as u64;
+        let tx: u64 = PeripheralMap::UART_FIFO_TX as u64;
+        let flags: u64 = PeripheralMap::UART_FLAGS as u64;
+        match addr{
+            rx  => return,
+            tx => self.uart.cpu_write_tx_fifo(data), 
+            flags => return,
+        }
     }
 
     /*
@@ -197,6 +213,10 @@ impl Memory {
     
     /* accept address pointing to 8 bit value */
     pub fn read_8bit(&mut self, addr: u64) -> u8 {
+        if self.check_peripheral(addr){
+            return self.peripheral_read(addr);
+        }
+
         let addr: usize = addr.try_into().unwrap();
         return self.mem[addr];
     }
@@ -205,13 +225,21 @@ impl Memory {
     pub fn read_32bit(&mut self, addr: u64) -> u32 {
         // also convert to 8 bit address
         let addr: usize = (addr*4).try_into().unwrap();
-        let slice: Vec<u8> = self.mem[addr..(addr+4)].to_vec(); 
+        let mut slice: Vec<u8> = Vec::new();
+
+        for i in 0..4{
+            slice.push(self.read_8bit((addr+i) as u64));
+        }
+
         let res: u32 = self.conv8to32(slice);
         return res; 
     }
 
     /* accept address pointing to 8 bit value */
     pub fn write_8bit(&mut self, addr: u64, data: u8) {
+        if self.check_peripheral(addr){
+            return self.peripheral_write(addr,data);
+        }
         let addr: usize = addr.try_into().unwrap();
         self.mem[addr] = data;
     }
@@ -222,7 +250,7 @@ impl Memory {
         let mut addr: usize = (addr*4).try_into().unwrap();
         let bytes:Vec<u8> = self.conv32to8(data);
         for byte in bytes {
-            self.mem[addr] = byte;
+            self.write_8bit(addr as u64,byte);
             addr+=1;
         }
     }
