@@ -1,6 +1,11 @@
-pub mod memory;
+mod memory;
 use memory::*;
+
+mod vuart;
 use vuart:: *;
+
+pub mod cpu;
+use cpu::*;
 
 const RX_ADDR: u64   = 0x7000000;
 const TX_ADDR: u64   = 0x7000001;

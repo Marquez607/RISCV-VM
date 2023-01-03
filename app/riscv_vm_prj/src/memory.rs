@@ -13,8 +13,7 @@ use std::{
     io::{Read, BufRead, BufReader},
 };
 use std::fs;
-pub mod vuart;
-use vuart::*;
+use crate::vuart::*;
 
 #[derive(Debug)]
 pub struct Memory {
