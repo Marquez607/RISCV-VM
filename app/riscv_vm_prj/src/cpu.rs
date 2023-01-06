@@ -20,4 +20,36 @@ impl Cpu {
             mem: Memory::new(),
         };
     }
+
+    fn decode(inst : u32) {
+
+    }
+
+    fn decode_r_type(inst : u32) {
+
+    }
+
+    fn decode_i_type(inst : u32) {
+
+    }
+
+    fn decode_s_type(inst : u32) {
+
+    }
+
+    fn decode_b_type(inst : u32) {
+
+    }
+
+    fn decode_u_type(inst : u32) {
+
+    }
+
+    fn decode_j_type(inst : u32) {
+
+    }
+
+
+
+
 }
