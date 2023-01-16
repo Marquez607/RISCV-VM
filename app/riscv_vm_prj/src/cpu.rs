@@ -4,6 +4,7 @@
 *  
 */
 use crate::memory::*;
+use crate::instructions::*;
 
 #[derive(Debug)]
 pub struct Cpu {
@@ -48,8 +49,6 @@ impl Cpu {
     fn decode_j_type(inst : u32) {
 
     }
-
-
 
 
 }

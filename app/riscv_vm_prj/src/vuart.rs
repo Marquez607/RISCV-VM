@@ -1,6 +1,8 @@
 /*
  * name: vuart.rs
  * desc: vitural uart for communicating with terminal
+ * 
+ * TODO: Add logging insted of print statements
  */
 
 use std::sync::{Arc, Mutex};
@@ -17,7 +19,6 @@ enum UartRegs {
 }
 
 impl UartRegs {
-
     pub const BASE: UartRegs = UartRegs::UART_FIFO_RX;
 }
 
@@ -126,7 +127,7 @@ impl Uart {
     pub fn ext_read_tx_fifo(&mut self) -> u8 {
         let mut uart = self.uart_arc.lock().unwrap();
         if (*uart).tx_fifo.is_empty(){
-            println!("ERROR: tx_fifo empty");
+            //println!("ERROR: tx_fifo empty");
             return 0; 
         }
         return (*uart).tx_fifo.pop_front().unwrap();
@@ -150,7 +151,7 @@ impl Uart {
     pub fn cpu_read_rx_fifo(&mut self) -> u8 {
         let mut uart = self.uart_arc.lock().unwrap();
         if (*uart).rx_fifo.is_empty(){
-            println!("ERROR: rx_fifo empty");
+            //println!("ERROR: rx_fifo empty");
             return 0; 
         }
         let ret: u8 = (*uart).rx_fifo.pop_front().unwrap();
