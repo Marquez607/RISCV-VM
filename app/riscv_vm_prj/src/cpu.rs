@@ -4,7 +4,8 @@
 *  
 */
 use crate::memory::*;
-use crate::instructions::*;
+use crate::idecoder::*;
+use std::process;
 
 #[derive(Debug)]
 pub struct Cpu {
@@ -23,6 +24,24 @@ impl Cpu {
     }
 
     fn decode(inst : u32) {
+        let inst_type: InstType = opcode_to_InstType(inst);
+
+        match inst_type {
+
+            // RType => , 
+            // IType => ,
+            // SType => ,
+            // BType => ,
+            // UType => ,
+            // JType => ,
+
+            /* just hard fault the cpu */
+            Invalid => {
+                println!("ERROR: Invalid Opcode, Hard Faulting");
+                println!("Received Instruction: {:08x}",inst);
+                process::exit(1);
+            },
+        }
 
     }
 

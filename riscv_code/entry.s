@@ -1,3 +1,4 @@
+/* taken almost verbatim from : https://wiki.osdev.org/RISC-V_Bare_Bones*/
 .section .init
  
 .option norvc
@@ -13,7 +14,7 @@ start:
 .option pop
  
 	/* Reset satp */
-	csrw satp, zero
+	/* csrw satp, zero */
  
 	/* Setup stack */
 	la sp, stack_top
@@ -27,7 +28,7 @@ bss_clear:
 	bgeu t5, t6, bss_clear
  
 	la t0, main
-	csrw mepc, t0
+	/* csrw mepc, t0 */
  
 	/* Jump to kernel! */
 	tail main

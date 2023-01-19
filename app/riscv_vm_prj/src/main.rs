@@ -7,8 +7,8 @@ use vuart:: *;
 mod cpu;
 use cpu::*;
 
-mod instructions;
-use instructions::*;
+mod idecoder;
+use idecoder::*;
 
 const RX_ADDR: u64   = 0x7000000;
 const TX_ADDR: u64   = 0x7000001;
