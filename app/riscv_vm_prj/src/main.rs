@@ -10,6 +10,9 @@ use cpu::*;
 mod idecoder;
 use idecoder::*;
 
+mod logging;
+use logging::*;
+
 const RX_ADDR: u64   = 0x7000000;
 const TX_ADDR: u64   = 0x7000001;
 const FLAG_ADDR: u64 = 0x7000002;

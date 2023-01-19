@@ -1,6 +1,11 @@
 /* file for all opcode decodings  */
+/* name: idecoders
+   author: Marquez Jones
+   desc: instruction decoding and execution
+ */
 /* refer to this pdf page 104: https://riscv.org/wp-content/uploads/2017/05/riscv-spec-v2.2.pdf  */
 /* desc of each instruction here https://mark.theis.site/riscv/ */
+/* alternative desc of each instruction here: https://msyksphinz-self.github.io/riscv-isadoc/html/rvi.html */
 
 /* INSTRUCTIONS NOT IMPLEMENTED
    mostly needed for implementing an OS-we will assume pure baremetal
@@ -11,12 +16,13 @@
    CSR*
 */
 
-use crate::memory::*;
-use std::process;
+/* program counter note */
+// I made he PC too big in cpu.rs and am too lazy to fix it
+// should be 32 bits, is 128 bits instead
 
-fn print_log( msg: String){
-    println!("{}",msg);
-}
+use crate::memory::*;
+use crate::logging::*;
+use std::process;
 
 #[derive(Debug)]
 pub enum InstType {
@@ -171,7 +177,7 @@ impl RTypeInst {
             }
 
             _ => {
-                print_log("Error: RTypeInst execute func3: invalid sel".to_string());
+                print_log("Error: RTypeInst execute invalid sel func3: {self.func3} opcode: {self.opcode}".to_string());
             }
 
         }
@@ -243,10 +249,96 @@ impl ITypeInst {
 
     }
 
-    pub fn execute(&mut self,arr: &mut [u32], pc: &mut u128, mem: &mut Memory) {
+    pub fn execute(&mut self,regs: &mut [u32], pc: &mut u128, mem: &mut Memory) {
+        
+        let opcode: u32 = self.opcode as u32;
 
+        /* opcode matching */
+        match opcode {
+            opcode if opcode == ITypeOpcodes::LD as u32 => {
+                self.load_execute(regs,pc,mem);
+            }
+            opcode if opcode == ITypeOpcodes::ALU as u32 => {
+                self.alu_execute(regs,pc,mem);
+            }
+            opcode if opcode == ITypeOpcodes::JALR as u32 => {
+                let func3: u32 = self.func3 as u32;
+                let rs1: usize = self.rs1 as usize; 
+                let rd: usize = self.rd as usize;
+                let imm: u32 = self.imm as u32;
+              
+                /* will handle here */
+                regs[rd as usize] = (*pc + 4) as u32;
+                *pc = ( (regs[rs1] as i128 + imm as i128) &  !(1 as i128) ) as u128; 
+
+            }
+            _ => {
+                print_log("ITypeInst execute() : Inavalid opcode {opcode}".to_string());
+            }
+
+        }
     }
 
+    fn load_execute(&mut self,regs: &mut [u32], pc: &mut u128, mem: &mut Memory) {
+        /* NOTE: all addresses are byte addressed */
+        let func3: u32 = self.func3 as u32;
+        let rs1: usize = self.rs1 as usize; 
+        let rd: usize = self.rd as usize;
+        let imm: u32 = self.imm as u32;
+
+        match func3 {
+            func3 if func3 == ITypeLoadFuncSel::LB as u32 => {
+                regs[rd] = mem.read_8bit(regs[rs1] as u64 + imm as u64) as u32;
+            }
+            func3 if func3 == ITypeLoadFuncSel::LH as u32 => {
+
+            }
+            func3 if func3 == ITypeLoadFuncSel::LW as u32 => {
+
+            }
+            func3 if func3 == ITypeLoadFuncSel::LBU as u32 => {
+
+            }
+            func3 if func3 == ITypeLoadFuncSel::LHU as u32 => {
+
+            }
+            _ => {
+
+            }
+        }
+    }
+
+    fn alu_execute(&mut self,regs: &mut [u32], pc: &mut u128, mem: &mut Memory) {
+
+        let func3: u32 = self.func3 as u32;
+        let rs1: u32 = self.rs1 as u32; 
+        let rd: u32 = self.rd as u32;
+        let imm: u32 = self.imm as u32;
+
+        match func3 {
+            func3 if func3 == ITypeALUFuncSel::ADDI as u32 => {
+
+            }
+            func3 if func3 == ITypeALUFuncSel::SLTI as u32 => {
+
+            }
+            func3 if func3 == ITypeALUFuncSel::STLIU as u32 => {
+
+            }
+            func3 if func3 == ITypeALUFuncSel::XORI as u32 => {
+
+            }
+            func3 if func3 == ITypeALUFuncSel::ORI as u32 => {
+
+            }
+            func3 if func3 == ITypeALUFuncSel::ANDI as u32 => {
+
+            }
+            _ => {
+
+            }
+        }
+    }
 }
 
 /* store type instruction */
