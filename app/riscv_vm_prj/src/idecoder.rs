@@ -290,33 +290,44 @@ impl ITypeInst {
     fn alu_execute(&mut self,regs: &mut [u32], pc: &mut u128, mem: &mut Memory) {
 
         let func3: u32 = self.func3 as u32;
-        let rs1:   u32 = self.rs1 as u32; 
-        let rd:    u32 = self.rd as u32;
+        let rs1:   usize = self.rs1 as usize; 
+        let rd:    usize = self.rd as usize;
         let imm:   i32 = self.imm as i32;
 
         match func3 {
             func3 if func3 == ITypeALUFuncSel::ADDI as u32 => {
-                regs[rd] = regs[rs1] as i32 + imm as i32; 
+                regs[rd] = (regs[rs1] as i32 + imm as i32) as u32; 
             }   
             func3 if func3 == ITypeALUFuncSel::SLTI as u32 => {
-
+                regs[rd] = ((regs[rs1] as i32) < imm as i32) as bool as u32; 
             }
             func3 if func3 == ITypeALUFuncSel::STLIU as u32 => {
-
+                regs[rd] = ((regs[rs1] as u32) < imm as u32) as bool as u32; 
             }
             func3 if func3 == ITypeALUFuncSel::XORI as u32 => {
-
+                regs[rd] = regs[rs1] as u32 ^ imm as u32; 
             }
             func3 if func3 == ITypeALUFuncSel::ORI as u32 => {
-
+                regs[rd] = regs[rs1] as u32 | imm as u32; 
             }
             func3 if func3 == ITypeALUFuncSel::ANDI as u32 => {
-
+                regs[rd] = regs[rs1] as u32 & imm as u32; 
             }
             _ => {
 
             }
         }
+    }
+
+    pub fn jalr_execute(&mut self,regs: &mut [u32], pc: &mut u128, mem: &mut Memory) {
+        let func3: u32 = self.func3 as u32;
+        let rs1: usize = self.rs1 as usize; 
+        let rd: usize = self.rd as usize;
+        let imm: u32 = self.imm as u32;
+      
+        /* will handle here */
+        regs[rd as usize] = (*pc + 4) as u32;
+        *pc = ( (regs[rs1] as i128 + imm as i128) &  !(1 as i128) ) as u128;     
     }
 
     pub fn execute(&mut self,regs: &mut [u32], pc: &mut u128, mem: &mut Memory) {
@@ -332,15 +343,7 @@ impl ITypeInst {
                 self.alu_execute(regs,pc,mem);
             }
             opcode if opcode == ITypeOpcodes::JALR as u32 => {
-                let func3: u32 = self.func3 as u32;
-                let rs1: usize = self.rs1 as usize; 
-                let rd: usize = self.rd as usize;
-                let imm: u32 = self.imm as u32;
-              
-                /* will handle here */
-                regs[rd as usize] = (*pc + 4) as u32;
-                *pc = ( (regs[rs1] as i128 + imm as i128) &  !(1 as i128) ) as u128; 
-
+                self.jalr_execute(regs,pc,mem);
             }
             _ => {
                 print_log("ITypeInst execute() : Inavalid opcode {opcode}".to_string());
