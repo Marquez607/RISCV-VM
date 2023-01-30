@@ -249,6 +249,76 @@ impl ITypeInst {
 
     }
 
+    fn load_execute(&mut self,regs: &mut [u32], pc: &mut u128, mem: &mut Memory) {
+        /* NOTE: all addresses are byte addressed */
+        let func3: u32 = self.func3 as u32;
+        let rs1: usize = self.rs1 as usize; 
+        let rd: usize = self.rd as usize;
+        let imm: i32 = self.imm as i32;
+
+        match func3 {
+
+            /* load byte */
+            func3 if func3 == ITypeLoadFuncSel::LB as u32 => {
+                regs[rd] = (mem.read_8bit(regs[rs1] as u64 + imm as u64) as i32) as u32; /* sign extend then recaste to u32 */
+            }
+
+            /* load half word (16 bits) */
+            func3 if func3 == ITypeLoadFuncSel::LH as u32 => {
+                regs[rd] = ((mem.read_32bit(regs[rs1] as u64 + imm as u64) as u16) as i32) as u32; /* truncate to 16 bits */ 
+            }
+
+            /* load word */
+            func3 if func3 == ITypeLoadFuncSel::LW as u32 => {
+                regs[rd] = mem.read_32bit(regs[rs1] as u64 + imm as u64);
+            }
+
+            /* load byte 0-extend */
+            func3 if func3 == ITypeLoadFuncSel::LBU as u32 => {
+                regs[rd] = (mem.read_8bit(regs[rs1] as u64 + imm as u64) as u32); /* DO NOT SIGN EXTEND */
+            } 
+            /* load half-word 0-extend */
+            func3 if func3 == ITypeLoadFuncSel::LHU as u32 => {
+                regs[rd] = ((mem.read_32bit(regs[rs1] as u64 + imm as u64) as u16) as u32); /* truncate to 16 bits then caste back to 32 bits */ 
+            }
+            _ => {
+
+            }
+        }
+    }
+
+    fn alu_execute(&mut self,regs: &mut [u32], pc: &mut u128, mem: &mut Memory) {
+
+        let func3: u32 = self.func3 as u32;
+        let rs1:   u32 = self.rs1 as u32; 
+        let rd:    u32 = self.rd as u32;
+        let imm:   i32 = self.imm as i32;
+
+        match func3 {
+            func3 if func3 == ITypeALUFuncSel::ADDI as u32 => {
+                regs[rd] = regs[rs1] as i32 + imm as i32; 
+            }   
+            func3 if func3 == ITypeALUFuncSel::SLTI as u32 => {
+
+            }
+            func3 if func3 == ITypeALUFuncSel::STLIU as u32 => {
+
+            }
+            func3 if func3 == ITypeALUFuncSel::XORI as u32 => {
+
+            }
+            func3 if func3 == ITypeALUFuncSel::ORI as u32 => {
+
+            }
+            func3 if func3 == ITypeALUFuncSel::ANDI as u32 => {
+
+            }
+            _ => {
+
+            }
+        }
+    }
+
     pub fn execute(&mut self,regs: &mut [u32], pc: &mut u128, mem: &mut Memory) {
         
         let opcode: u32 = self.opcode as u32;
@@ -279,66 +349,6 @@ impl ITypeInst {
         }
     }
 
-    fn load_execute(&mut self,regs: &mut [u32], pc: &mut u128, mem: &mut Memory) {
-        /* NOTE: all addresses are byte addressed */
-        let func3: u32 = self.func3 as u32;
-        let rs1: usize = self.rs1 as usize; 
-        let rd: usize = self.rd as usize;
-        let imm: u32 = self.imm as u32;
-
-        match func3 {
-            func3 if func3 == ITypeLoadFuncSel::LB as u32 => {
-                regs[rd] = mem.read_8bit(regs[rs1] as u64 + imm as u64) as u32;
-            }
-            func3 if func3 == ITypeLoadFuncSel::LH as u32 => {
-
-            }
-            func3 if func3 == ITypeLoadFuncSel::LW as u32 => {
-
-            }
-            func3 if func3 == ITypeLoadFuncSel::LBU as u32 => {
-
-            }
-            func3 if func3 == ITypeLoadFuncSel::LHU as u32 => {
-
-            }
-            _ => {
-
-            }
-        }
-    }
-
-    fn alu_execute(&mut self,regs: &mut [u32], pc: &mut u128, mem: &mut Memory) {
-
-        let func3: u32 = self.func3 as u32;
-        let rs1: u32 = self.rs1 as u32; 
-        let rd: u32 = self.rd as u32;
-        let imm: u32 = self.imm as u32;
-
-        match func3 {
-            func3 if func3 == ITypeALUFuncSel::ADDI as u32 => {
-
-            }
-            func3 if func3 == ITypeALUFuncSel::SLTI as u32 => {
-
-            }
-            func3 if func3 == ITypeALUFuncSel::STLIU as u32 => {
-
-            }
-            func3 if func3 == ITypeALUFuncSel::XORI as u32 => {
-
-            }
-            func3 if func3 == ITypeALUFuncSel::ORI as u32 => {
-
-            }
-            func3 if func3 == ITypeALUFuncSel::ANDI as u32 => {
-
-            }
-            _ => {
-
-            }
-        }
-    }
 }
 
 /* store type instruction */

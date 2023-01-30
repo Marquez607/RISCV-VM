@@ -216,10 +216,10 @@ impl Memory {
         return self.mem[addr];
     }
 
-    /* accept address pointer to 32 bit value */
+    /* accept address pointer to 8 bit value */
     pub fn read_32bit(&mut self, addr: u64) -> u32 {
         // also convert to 8 bit address
-        let addr: usize = (addr*4).try_into().unwrap();
+        let addr: usize = addr as usize;
         let mut slice: Vec<u8> = Vec::new();
 
         for i in 0..4{
@@ -239,10 +239,10 @@ impl Memory {
         self.mem[addr] = data;
     }
     
-    /* accept address pointer to 32 bit value */
+    /* accept address pointer to 8 bit value */
     pub fn write_32bit(&mut self, addr: u64, data: u32) {
         /* convert to 8 bit address */
-        let mut addr: usize = (addr*4).try_into().unwrap();
+        let mut addr: usize = addr as usize;
         let bytes:Vec<u8> = self.conv32to8(data);
         for byte in bytes {
             self.write_8bit(addr as u64,byte);
